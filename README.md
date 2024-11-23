@@ -1,4 +1,6 @@
-My housemates and I get our groceries delivered from Tesco every week. The bill is always sent via email, and is a pain to split (a. takes precious minutes away from your life; b. it's boring work). So I decided to build this SvelteKit app to help us out. This is how it works for now:
+### Why?
+
+My housemates and I get our groceries delivered from Tesco every week. The bill is always sent via email, and is a pain to split (*a. takes precious minutes away from your life; b. it's boring work*). So I decided to build this SvelteKit app to help us out. This is how it works for now:
   
   1. Let's a user upload a PDF of our latest grocery bill.
   2. Converts the PDF to a series of Base64 images and sends them to an LLM via OpenRouter (as of writing this, I've settled on Claude 3.5 Sonnet).
@@ -7,7 +9,7 @@ My housemates and I get our groceries delivered from Tesco every week. The bill 
   5. The user can then choose which housemate bought each item; multiple choices are allowed but then the cost is shared evenly.
   6. The final totals for each housemate is calculated and shown.
 
-TODO:
+### TODO:
 - [ ] Host it as a 24/7 service on my home server.
 - [ ] Ability to export the final report so it can be shared in our group chat for transparency.
 - [ ] Storing purchaser & item records in a database for record keeping purposes and maybe some fun analytics around our grocery purchases!
