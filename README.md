@@ -8,9 +8,9 @@ My housemates and I get our groceries delivered from Tesco every week. The bill 
   6. The final totals for each housemate is calculated and shown.
 
 TODO:
-- Host it as a 24/7 service on my home server.
-- Ability to export the final report so it can be shared in our group chat for transparency.
-- Storing purchaser & item records in a database for record keeping purposes and maybe some fun analytics around our grocery purchases!
+- [ ] Host it as a 24/7 service on my home server.
+- [ ] Ability to export the final report so it can be shared in our group chat for transparency.
+- [ ] Storing purchaser & item records in a database for record keeping purposes and maybe some fun analytics around our grocery purchases!
 
 ---
 
