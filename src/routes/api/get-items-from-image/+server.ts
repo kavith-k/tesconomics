@@ -115,7 +115,9 @@ async function convertReceiptToJson(images: string[]): Promise<FunctionResponse>
 			!Array.isArray(llmResponse.choices) ||
 			llmResponse.choices.length === 0
 		) {
-			throw new Error(`Received the following response from OpenRouter: ${llmResponse}`);
+			throw new Error(
+				`Received the following response from OpenRouter: ${JSON.stringify(llmResponse)}`
+			);
 		}
 		try {
 			jsonReceipt = JSON.parse(llmResponse.choices[0].message.content);
