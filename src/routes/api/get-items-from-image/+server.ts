@@ -1,4 +1,4 @@
-import { OPENROUTER_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { ReceiptEntry, FunctionResponse } from '$lib/types';
 import { json, error } from '@sveltejs/kit';
 
@@ -20,7 +20,7 @@ async function queryLlm(model: string, messages: Message[], mockRequest: boolean
 		const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+				Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
@@ -158,7 +158,7 @@ export async function POST({ request }: { request: Request }) {
 
 	// Error converting the receipt to JSON
 	if (jsonReceiptResponse.status === 'failure')
-		error(500, `Error converting the receipt to JSON. ${jsonReceiptResponse.content}`);
+		return error(502, `Error converting the receipt to JSON. ${jsonReceiptResponse.content}`);
 
 	// Returning items in the receipt as JSON
 	return json(JSON.parse(jsonReceiptResponse.content));

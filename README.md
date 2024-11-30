@@ -1,7 +1,7 @@
 ### Why?
 
 My housemates and I get our groceries delivered from Tesco every week. The bill is always sent via email, and is a pain to split (*a. takes precious minutes away from your life; b. it's boring work*). So I decided to build this SvelteKit app to help us out. This is how it works for now:
-  
+
   1. Let's a user upload a PDF of our latest grocery bill.
   2. Converts the PDF to a series of Base64 images and sends them to an LLM via OpenRouter (as of writing this, I've settled on Claude 3.5 Sonnet).
   3. The LLM is instructed to extract the items in the bill and respond with a JSON containing all the relevant information.
@@ -11,7 +11,7 @@ My housemates and I get our groceries delivered from Tesco every week. The bill 
 
 ### TODO:
 - [ ] Host it as a 24/7 service on my home server.
-- [ ] Loading indicator when waiting for LLM to respond.
+- [x] Loading indicator when waiting for LLM to respond.
 - [ ] Ability to export the final report so it can be shared in our group chat for transparency.
 - [ ] Storing purchaser & item records in a database for record keeping purposes and maybe some fun analytics around our grocery purchases!
 
@@ -55,3 +55,22 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## Containerising
+
+1. Build the image:
+```bash
+docker build -t tesconomics .
+```
+
+2. Run the app:
+
+**NOTE:** Make sure to specify your OpenRouter API Key & the URL in which the app will run on (e.g.: http://localhost:3000)
+
+```bash
+docker run \
+  -p 3000:3000 \
+  -e OPENROUTER_API_KEY=${API_KEY} \
+  -e ORIGIN=${URL} \
+  tesconomics
+```

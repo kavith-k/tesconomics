@@ -20,6 +20,7 @@
 		Kavith: 0
 	});
 	let isExpenditureTableVisible = $state(false);
+	let isTableLoaderVisible = $state(false);
 
 	// Utility function to make sure there's an individual item record for every item in the receipt
 	// E.g. If there's an item with quantity=2, two identical records will be returned with quantity=1,
@@ -40,6 +41,8 @@
 	}
 
 	async function getItemsFromPDF(event: Event) {
+		isTableLoaderVisible = true;
+
 		const input = event.target as HTMLInputElement;
 		if (!input.files) return;
 		const file = input.files[0];
@@ -71,13 +74,22 @@
 				base64Images.push(base64Image);
 			}
 
-			const response = await fetch('/api/get-items-from-image', {
+			await fetch('/api/get-items-from-image', {
 				method: 'POST',
 				body: JSON.stringify({ images: base64Images })
-			});
-
-			const receiptItems: ReceiptEntry[] = await response.json();
-			setIndividualItemRecords(receiptItems);
+			})
+				.then((response) => {
+					if (!response.ok)
+						throw new Error(`Backend errored out. ${response.status} - ${response.statusText}`);
+					return response.json();
+				})
+				.then((receiptItems: ReceiptEntry[]) => {
+					setIndividualItemRecords(receiptItems);
+				})
+				.catch((error) => {
+					console.error('Error getting receipt items from image.', error);
+				})
+				.finally(() => (isTableLoaderVisible = false));
 		};
 		fileReader.readAsArrayBuffer(file);
 	}
@@ -100,6 +112,9 @@
 <div class="m-4 grid w-full max-w-sm items-center gap-1.5">
 	<Label for="receipt">PDF Receipt</Label>
 	<Input id="receipt" type="file" accept=".pdf" on:change={getItemsFromPDF} />
+	{#if isTableLoaderVisible}
+		<div class="mt-4 h-6 w-6 animate-spin rounded-full border-b-2 border-gray-900"></div>
+	{/if}
 </div>
 
 {#if items.length !== 0}
