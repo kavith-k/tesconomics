@@ -104,6 +104,10 @@
 			for (const p of item.purchasers) purchaserExpenditure[p] += perPersonCost;
 		}
 
+		// Rounding final values to 2 decimal places
+		for (const key in purchaserExpenditure)
+			purchaserExpenditure[key] = Number(purchaserExpenditure[key].toFixed(2));
+
 		// Making sure the total expenditure table is visible
 		isExpenditureTableVisible = true;
 	}
