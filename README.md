@@ -44,7 +44,7 @@ You are a grocery receipt processing assistant that takes in image inputs. You M
 ## TODO
 - [x] Host it as a 24/7 service on my home server.
 - [x] Loading indicator when waiting for LLM to respond.
-- [ ] ~~Ability to export the final report so it can be shared in our group chat for transparency.~~ (PDF export of the page seems to work for us!)
+- [x] ~~Ability to export the final report so it can be shared in our group chat for transparency.~~ (PDF export of the page seems to work for us!)
 - [ ] Storing purchaser & item records in a database for record keeping purposes and maybe some fun analytics around our grocery purchases!
 
 ---
