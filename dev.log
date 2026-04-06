@@ -1,0 +1,120 @@
+
+> app@0.0.1 dev
+> npm run prepare && vite dev
+
+
+> app@0.0.1 prepare
+> cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs static/pdf.worker.mjs
+
+Port 5173 is in use, trying another one...
+
+  VITE v5.4.11  ready in 633 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: use --host to expose
+SvelteKitError: Not found: /page-test-header
+    at resolve (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:530:13)
+    at resolve (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:330:5)
+    at Object.eval [as handle] (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/index.js:71:56)
+    at Module.respond (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:327:40) {
+  status: 404,
+  text: 'Not Found'
+}
+Browserslist: browsers data (caniuse-lite) is 15 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2:22:25 PM [vite] ✨ new dependencies optimized: devalue
+2:22:25 PM [vite] ✨ optimized dependencies changed. reloading
+SvelteKitError: Not found: /page-test-header
+    at resolve (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:530:13)
+    at resolve (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:330:5)
+    at Object.eval [as handle] (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/index.js:71:56)
+    at Module.respond (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:327:40) {
+  status: 404,
+  text: 'Not Found'
+}
+2:23:15 PM [vite] page reload src/routes/page-test-header.svelte
+2:23:15 PM [vite] page reload .svelte-kit/generated/client/app.js
+2:23:15 PM [vite] page reload .svelte-kit/generated/client/app.js
+SvelteKitError: Not found: /page-test-header
+    at resolve (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:530:13)
+    at resolve (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:330:5)
+    at Object.eval [as handle] (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/index.js:71:56)
+    at Module.respond (/Users/toshita/Projects/tesconomics/node_modules/@sveltejs/kit/src/runtime/server/respond.js:327:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  status: 404,
+  text: 'Not Found'
+}
+2:23:29 PM [vite] Pre-transform error: Failed to load url ../app.css (resolved id: ../app.css) in /Users/toshita/Projects/tesconomics/src/routes/test-header/+page.svelte. Does the file exist?
+2:23:29 PM [vite] Error when evaluating SSR module /src/routes/test-header/+page.svelte:
+|- Error: Failed to load url ../app.css (resolved id: ../app.css) in /Users/toshita/Projects/tesconomics/src/routes/test-header/+page.svelte. Does the file exist?
+    at loadAndTransform (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17)
+    at async instantiateModule (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:52874:44)
+
+Error: Failed to load url ../app.css (resolved id: ../app.css) in /Users/toshita/Projects/tesconomics/src/routes/test-header/+page.svelte. Does the file exist?
+    at loadAndTransform (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17)
+    at async instantiateModule (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:52874:44) {
+  code: 'ERR_LOAD_URL'
+}
+Error: Failed to load url ../app.css (resolved id: ../app.css) in /Users/toshita/Projects/tesconomics/src/routes/test-header/+page.svelte. Does the file exist?
+    at loadAndTransform (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17)
+    at async instantiateModule (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:52874:44) {
+  code: 'ERR_LOAD_URL'
+}
+Error: Failed to load url ../app.css (resolved id: ../app.css) in /Users/toshita/Projects/tesconomics/src/routes/test-header/+page.svelte. Does the file exist?
+    at loadAndTransform (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:51920:17)
+    at async instantiateModule (file:///Users/toshita/Projects/tesconomics/node_modules/vite/dist/node/chunks/dep-CB_7IfJ-.js:52874:44) {
+  code: 'ERR_LOAD_URL'
+}
+2:25:19 PM [vite] page reload src/routes/test-header/+page.svelte
+2:25:19 PM [vite] page reload src/routes/test-header/+page.svelte
+2:25:21 PM [vite] ✨ new dependencies optimized: dequal, nanoid/non-secure, @internationalized/date, @floating-ui/dom, focus-trap
+2:25:21 PM [vite] ✨ optimized dependencies changed. reloading
+2:29:45 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:29:46 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:32:42 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:33:00 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:40:06 PM [vite] page reload src/app.html
+2:40:06 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:40:13 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:41:25 PM [vite] page reload src/app.html
+2:41:25 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:41:35 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:41:35 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:42:28 PM [vite] page reload src/app.html
+2:42:28 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:42:41 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:43:20 PM [vite] page reload src/app.html
+2:43:21 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:43:25 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:43:30 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:45:09 PM [vite] page reload src/app.html
+2:45:09 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:45:15 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:45:52 PM [vite] page reload src/app.html
+2:45:52 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:45:55 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:46:28 PM [vite] page reload src/app.html
+2:46:28 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:46:31 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:47:00 PM [vite] page reload src/app.html
+2:47:00 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:47:03 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:47:39 PM [vite] page reload src/app.html
+2:47:39 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:47:42 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:48:34 PM [vite] page reload src/app.html
+2:48:34 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:48:37 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:49:21 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:49:31 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:50:20 PM [vite] page reload src/app.html
+2:50:21 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:50:30 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:50:31 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:51:29 PM [vite] page reload src/app.html
+2:51:30 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:51:38 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
+2:54:20 PM [vite] page reload src/app.html
+2:54:20 PM [vite] page reload .svelte-kit/generated/server/internal.js
+2:54:30 PM [vite] hmr update /src/routes/test-header/+page.svelte, /src/app.css
