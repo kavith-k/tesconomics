@@ -3,7 +3,7 @@
 My housemates and I get our groceries delivered from Tesco every week. The bill is always sent via email, and is a pain to split (*a. takes precious minutes away from our lives; b. it's boring work*). So I decided to build this SvelteKit app to help us out. This is how it works for now:
 
   1. Let's a user upload a PDF of our latest grocery bill.
-  2. Converts the PDF to a series of Base64 images and sends them to an LLM via OpenRouter (as of writing this, I've settled on Claude 3.5 Sonnet).
+  2. Converts the PDF to a series of Base64 images and sends them to an LLM via OpenRouter (as of writing this, I've settled on Gemini 3.7 Flash).
   3. The LLM is instructed to extract the items in the bill and respond with a JSON containing all the relevant information.
   4. The JSON is parsed and the items are shown in a simple table to the user.
   5. The user can then choose which housemate bought each item; multiple choices are allowed but then the cost is shared evenly.
@@ -11,7 +11,7 @@ My housemates and I get our groceries delivered from Tesco every week. The bill 
 
 ## Prompt
 
-I spent a good while messing with different prompts and models, and I found this to be the best performing prompt with Claude 3.5 Sonnet:
+I spent a good while messing with different prompts and models, and I found this to be the best performing prompt with Gemini 3.7 Flash:
 
 ```
 You are a grocery receipt processing assistant that takes in image inputs. You MUST respond with ONLY a valid JSON array containing objects with exactly these fields: "product" (string), "quantity" (number), "cost" (number). Parse receipts using these rules:

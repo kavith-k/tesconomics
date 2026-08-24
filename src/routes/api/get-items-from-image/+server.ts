@@ -37,7 +37,7 @@ async function queryLlm(model: string, messages: Message[], mockRequest: boolean
 		return {
 			id: 'gen-1742682890-bRn4x0BWEZwQC1V82XXU',
 			provider: 'Anthropic',
-			model: 'google/gemini-2.5-flash',
+			model: 'google/gemini-3.7-flash',
 			object: 'chat.completion',
 			created: 1000000000,
 			choices: [
@@ -66,7 +66,7 @@ async function convertReceiptToJson(images: string[]): Promise<FunctionResponse>
 	let jsonReceipt: Array<ReceiptEntry> = [];
 
 	// Using an LLM to convert the base64 images into a structured JSON
-	const model = 'google/gemini-2.5-flash';
+	const model = 'google/gemini-3.7-flash';
 
 	const systemPrompt: Message = {
 		role: 'system',
