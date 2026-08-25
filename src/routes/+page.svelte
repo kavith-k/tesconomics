@@ -15,7 +15,6 @@
 	let base64Images: string[] = $state([]);
 	let items: Item[] = $state([]);
 	let purchaserExpenditure: { [key: string]: number } = $state({
-		Barbara: 0,
 		Toshita: 0,
 		Kavith: 0
 	});
