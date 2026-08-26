@@ -6,18 +6,7 @@
 	import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 	import type { ReceiptEntry, Item, Category } from '$lib/types';
 	import { onMount } from 'svelte';
-	import {
-		Upload,
-		FileText,
-		X,
-		Check,
-		Trash2,
-		Plus,
-		Download,
-		Users,
-		Edit2,
-		Save
-	} from 'lucide-svelte';
+	import { Upload, FileText, X, Check, Trash2, Download, Users, Edit2, Save } from 'lucide-svelte';
 
 	if (typeof window !== 'undefined') {
 		GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
@@ -25,6 +14,7 @@
 
 	const DEFAULT_PURCHASERS = ['Toshita', 'Kavith'];
 
+	// Keywords used to auto-sort receipt items into a category (see categorizeItem below)
 	const CATEGORY_KEYWORDS: Record<Category, string[]> = {
 		dairy: ['milk', 'cheese', 'yoghurt', 'yogurt', 'butter', 'cream', 'egg', 'feta', 'fromage'],
 		meat: ['chicken', 'beef', 'pork', 'bacon', 'sausage', 'ham', 'turkey', 'lamb', 'fillet'],
@@ -92,25 +82,24 @@
 		other: []
 	};
 
-	let base64Images: string[] = $state([]);
+	// Receipt items and the people they're split between
 	let items: Item[] = $state([]);
 	let purchasers: string[] = $state([]);
 	let purchaserExpenditure: { [key: string]: number } = $state({});
 	let isExpenditureTableVisible = $state(false);
-	let isTableLoaderVisible = $state(false);
-	let isDialogOpen = $state(false);
-	let isAddItemOpen = $state(false);
+
+	// Upload dialog and PDF processing
+	let isUploadDialogOpen = $state(false);
 	let selectedFile: File | null = $state(null);
 	let isDragging = $state(false);
+	let isTableLoaderVisible = $state(false);
 	let uploadProgress = $state(0);
+	let base64Images: string[] = $state([]);
 
+	// Inline editing of a single item
 	let editingItemId: number | null = $state(null);
 	let editName = $state('');
 	let editCost = $state(0);
-
-	let newItemName = $state('');
-	let newItemCost = $state(0);
-	let newItemQuantity = $state(1);
 
 	let newPurchaserName = $state('');
 
@@ -143,7 +132,9 @@
 		return 'other';
 	}
 
-	async function setIndividualItemRecords(receiptItems: ReceiptEntry[]) {
+	// Splits multi-quantity receipt lines (e.g. "3x Apples") into one row per unit,
+	// so each unit can be assigned to a different purchaser.
+	function addReceiptItemsToTable(receiptItems: ReceiptEntry[]) {
 		let itemId = items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
 
 		for (const item of receiptItems) {
@@ -176,7 +167,7 @@
 
 		isTableLoaderVisible = true;
 		uploadProgress = 10;
-		isDialogOpen = false;
+		isUploadDialogOpen = false;
 
 		const fileReader = new FileReader();
 
@@ -216,7 +207,7 @@
 					return response.json();
 				})
 				.then((receiptItems: ReceiptEntry[]) => {
-					setIndividualItemRecords(receiptItems);
+					addReceiptItemsToTable(receiptItems);
 				})
 				.catch((error) => {
 					console.error('Error getting receipt items from image.', error);
@@ -250,6 +241,7 @@
 		selectedFile = null;
 	}
 
+	// Each item's cost is split evenly across everyone assigned to it.
 	function calculateExpenditure() {
 		for (const key in purchaserExpenditure) purchaserExpenditure[key] = 0;
 
@@ -275,12 +267,12 @@
 		return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 	}
 
-	function openDialog() {
-		isDialogOpen = true;
+	function openUploadDialog() {
+		isUploadDialogOpen = true;
 	}
 
-	function closeDialog() {
-		isDialogOpen = false;
+	function closeUploadDialog() {
+		isUploadDialogOpen = false;
 		selectedFile = null;
 	}
 
@@ -312,27 +304,8 @@
 		editCost = 0;
 	}
 
-	function addItem() {
-		if (!newItemName || newItemCost <= 0) return;
-		const itemId = items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
-		for (let i = 0; i < newItemQuantity; i++) {
-			items.push({
-				id: itemId + i,
-				name: newItemName,
-				purchasers: [],
-				cost: newItemCost / newItemQuantity,
-				category: categorizeItem(newItemName)
-			});
-		}
-		newItemName = '';
-		newItemCost = 0;
-		newItemQuantity = 1;
-		isAddItemOpen = false;
-	}
-
 	function selectAllPurchasers(item: Item) {
 		item.purchasers = [...purchasers];
-		items = items;
 	}
 
 	function addPurchaser() {
@@ -365,41 +338,6 @@
 			grouped[item.category].push(item);
 		}
 		return grouped;
-	}
-
-	function exportCSV() {
-		const headers = ['No.', 'Product', 'Category', 'Cost', 'Purchasers'];
-		const rows = items.map((item) => [
-			item.id,
-			item.name,
-			item.category,
-			item.cost.toFixed(2),
-			item.purchasers.join(', ')
-		]);
-		const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\n');
-		const blob = new Blob([csvContent], { type: 'text/csv' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'receipt_items.csv';
-		a.click();
-		URL.revokeObjectURL(url);
-	}
-
-	function exportExpenditureCSV() {
-		const headers = ['Purchaser', 'Total Spent'];
-		const rows = Object.entries(purchaserExpenditure).map(([name, amount]) => [
-			name,
-			amount.toFixed(2)
-		]);
-		const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\n');
-		const blob = new Blob([csvContent], { type: 'text/csv' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'expenditure_split.csv';
-		a.click();
-		URL.revokeObjectURL(url);
 	}
 
 	function exportPDF() {
@@ -529,12 +467,15 @@
 		>
 	</header>
 
-	{#if isDialogOpen}
+	{#if isUploadDialogOpen}
 		<div
 			class="fixed inset-0 z-50 flex items-center justify-center"
 			style="animation: fadeIn 0.2s ease-out;"
 		>
-			<button class="absolute inset-0 bg-black/80" onclick={closeDialog} aria-label="Close dialog"
+			<button
+				class="absolute inset-0 bg-black/80"
+				onclick={closeUploadDialog}
+				aria-label="Close dialog"
 			></button>
 			<div
 				class="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
@@ -544,7 +485,7 @@
 					<h2 class="text-lg font-semibold text-gray-900">Upload PDF Receipt</h2>
 					<button
 						class="rounded-full p-1 transition-colors hover:bg-gray-100"
-						onclick={closeDialog}
+						onclick={closeUploadDialog}
 					>
 						<X class="h-5 w-5 text-gray-500" />
 					</button>
@@ -624,53 +565,6 @@
 		</div>
 	{/if}
 
-	{#if isAddItemOpen}
-		<div
-			class="fixed inset-0 z-50 flex items-center justify-center"
-			style="animation: fadeIn 0.2s ease-out;"
-		>
-			<button
-				class="absolute inset-0 bg-black/80"
-				onclick={() => (isAddItemOpen = false)}
-				aria-label="Close"
-			></button>
-			<div
-				class="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
-				style="animation: scaleIn 0.2s ease-out;"
-			>
-				<div class="mb-4 flex items-center justify-between">
-					<h2 class="text-lg font-semibold text-gray-900">Add Missing Item</h2>
-					<button
-						class="rounded-full p-1 transition-colors hover:bg-gray-100"
-						onclick={() => (isAddItemOpen = false)}
-					>
-						<X class="h-5 w-5 text-gray-500" />
-					</button>
-				</div>
-
-				<div class="space-y-4">
-					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700">Product Name</label>
-						<Input type="text" bind:value={newItemName} placeholder="e.g., Milk 1L" />
-					</div>
-					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700">Cost (€)</label>
-						<Input type="number" step="0.01" bind:value={newItemCost} placeholder="0.00" />
-					</div>
-					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700">Quantity</label>
-						<Input type="number" min="1" bind:value={newItemQuantity} />
-					</div>
-				</div>
-
-				<Button class="mt-4 w-full" onclick={addItem} disabled={!newItemName || newItemCost <= 0}>
-					<Plus class="mr-2 h-4 w-4" />
-					Add Item
-				</Button>
-			</div>
-		</div>
-	{/if}
-
 	<p
 		class="mt-12 w-full bg-gradient-to-r from-[#00539f] via-gray-600 to-[#ff0000] bg-clip-text px-8 text-center font-['Courgette'] text-[1.375rem] leading-loose text-transparent"
 	>
@@ -682,7 +576,7 @@
 	<Button
 		variant="outline"
 		class="mt-8 gap-2 rounded-lg bg-gradient-to-r from-blue-400 via-slate-400 to-red-400 px-6 py-3 text-lg font-semibold text-white transition-opacity hover:opacity-90"
-		onclick={openDialog}
+		onclick={openUploadDialog}
 	>
 		<Upload class="h-5 w-5" />
 		Upload Receipt
@@ -703,14 +597,6 @@
 
 	{#if items.length !== 0}
 		<div class="m-4 flex gap-2">
-			<Button variant="outline" onclick={() => (isAddItemOpen = true)}>
-				<Plus class="mr-2 h-4 w-4" />
-				Add Item
-			</Button>
-			<Button variant="outline" onclick={exportCSV}>
-				<Download class="mr-2 h-4 w-4" />
-				Export CSV
-			</Button>
 			<Button variant="outline" onclick={exportPDF}>
 				<Download class="mr-2 h-4 w-4" />
 				Export PDF
@@ -768,7 +654,6 @@
 												multiple
 												onSelectedChange={(s) => {
 													if (s) item.purchasers = s.map((p) => p.value) as string[];
-													items = items;
 												}}
 											>
 												<Select.Trigger class="min-w-[120px]">
@@ -814,13 +699,7 @@
 
 	{#if isExpenditureTableVisible}
 		<div class="m-4 max-w-[40vw]">
-			<div class="mb-2 flex items-center justify-between">
-				<h3 class="text-lg font-semibold">Expenditure Breakdown</h3>
-				<Button variant="outline" size="sm" onclick={exportExpenditureCSV}>
-					<Download class="mr-1 h-4 w-4" />
-					Export CSV
-				</Button>
-			</div>
+			<h3 class="mb-2 text-lg font-semibold">Expenditure Breakdown</h3>
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
