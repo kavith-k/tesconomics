@@ -5,14 +5,13 @@
 	import * as Select from '$lib/components/ui/select';
 	import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 	import type { ReceiptEntry, Item, Category } from '$lib/types';
-	import { onMount } from 'svelte';
 	import { Upload, FileText, X, Check, Trash2, Download, Users, Edit2, Save } from 'lucide-svelte';
 
 	if (typeof window !== 'undefined') {
 		GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 	}
 
-	const DEFAULT_PURCHASERS = ['Toshita', 'Kavith'];
+	const PURCHASERS = ['Toshita', 'Kavith'];
 
 	// Keywords used to auto-sort receipt items into a category (see categorizeItem below)
 	const CATEGORY_KEYWORDS: Record<Category, string[]> = {
@@ -84,8 +83,10 @@
 
 	// Receipt items and the people they're split between
 	let items: Item[] = $state([]);
-	let purchasers: string[] = $state([]);
-	let purchaserExpenditure: { [key: string]: number } = $state({});
+	let purchasers: string[] = $state([...PURCHASERS]);
+	let purchaserExpenditure: { [key: string]: number } = $state(
+		Object.fromEntries(PURCHASERS.map((p) => [p, 0]))
+	);
 	let isExpenditureTableVisible = $state(false);
 
 	// Upload dialog and PDF processing
@@ -100,26 +101,6 @@
 	let editingItemId: number | null = $state(null);
 	let editName = $state('');
 	let editCost = $state(0);
-
-	let newPurchaserName = $state('');
-
-	onMount(() => {
-		const stored = localStorage.getItem('purchasers');
-		if (stored) {
-			purchasers = JSON.parse(stored);
-		} else {
-			purchasers = [...DEFAULT_PURCHASERS];
-		}
-		purchaserExpenditure = Object.fromEntries(purchasers.map((p) => [p, 0]));
-	});
-
-	function savePurchasers(newPurchasers: string[]) {
-		purchasers = newPurchasers;
-		purchaserExpenditure = Object.fromEntries(purchasers.map((p) => [p, 0]));
-		if (typeof window !== 'undefined') {
-			localStorage.setItem('purchasers', JSON.stringify(purchasers));
-		}
-	}
 
 	function categorizeItem(productName: string): Category {
 		const lower = productName.toLowerCase();
@@ -306,20 +287,6 @@
 
 	function selectAllPurchasers(item: Item) {
 		item.purchasers = [...purchasers];
-	}
-
-	function addPurchaser() {
-		const name = newPurchaserName.trim();
-		if (!name || purchasers.includes(name)) return;
-		savePurchasers([...purchasers, name]);
-		newPurchaserName = '';
-	}
-
-	function removePurchaser(name: string) {
-		savePurchasers(purchasers.filter((p) => p !== name));
-		for (const item of items) {
-			item.purchasers = item.purchasers.filter((p) => p !== name);
-		}
 	}
 
 	function groupByCategory(items: Item[]): Record<Category, Item[]> {
