@@ -106,7 +106,7 @@ async function convertReceiptToJson(images: string[]): Promise<FunctionResponse>
 
 	const messages: Message[] = [systemPrompt, userPrompt];
 
-	const llmResponse = await queryLlm(model, messages, false);
+	const llmResponse = await queryLlm(model, messages, true);
 
 	// Making sure there's valid JSON data in the model's response, and extracting it
 	try {
