@@ -2,9 +2,8 @@
 FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 
-# Install dependencies first & create the pdf worker file
+# Install dependencies first
 COPY package*.json ./
-RUN mkdir -p static
 RUN npm ci
 
 # Copy source files
@@ -36,5 +35,5 @@ ENV PORT=3000
 # Increasing the server's body size limit to 5MB
 ENV BODY_SIZE_LIMIT=5M
 
-# Command to run the application
-CMD ["node", "build"]
+# Require housemates when starting the container
+CMD ["sh", "-c", ": \"${HOUSEMATES:?Set HOUSEMATES to comma-separated names}\"; exec node build"]

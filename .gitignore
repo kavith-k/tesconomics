@@ -1,4 +1,7 @@
 node_modules
+/test-receipts/
+/plan.md
+*.eml
 
 # Output
 .output

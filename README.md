@@ -1,49 +1,19 @@
 ## Why?
 
-My housemates and I get our groceries delivered from Tesco every week. The bill is always sent via email, and is a pain to split (*a. takes precious minutes away from our lives; b. it's boring work*). So I decided to build this SvelteKit app to help us out. This is how it works for now:
+My housemates and I get our groceries delivered from Tesco every week. The bill is always sent via email, and is a pain to split (_a. takes precious minutes away from our lives; b. it's boring work_). So I decided to build this SvelteKit app to help us out. This is how it works for now:
 
-  1. Let's a user upload a PDF of our latest grocery bill.
-  2. Converts the PDF to a series of Base64 images and sends them to an LLM via OpenRouter (as of writing this, I've settled on Gemini 3.7 Flash).
-  3. The LLM is instructed to extract the items in the bill and respond with a JSON containing all the relevant information.
-  4. The JSON is parsed and the items are shown in a simple table to the user.
-  5. The user can then choose which housemate bought each item; multiple choices are allowed but then the cost is shared evenly.
-  6. The final totals for each housemate is calculated and shown.
+1. A user saves the final Tesco receipt email as an `.eml` file and uploads it.
+2. The app reads the receipt directly from the email and pulls out the delivered items.
+3. The items are shown in a simple table.
+4. The user can then choose which housemate bought each item; multiple choices are allowed, but then the cost is shared evenly.
+5. The final total for each housemate is calculated and shown.
 
-## Prompt
-
-I spent a good while messing with different prompts and models, and I found this to be the best performing prompt with Gemini 3.7 Flash:
-
-```
-You are a grocery receipt processing assistant that takes in image inputs. You MUST respond with ONLY a valid JSON array containing objects with exactly these fields: "product" (string), "quantity" (number), "cost" (number). Parse receipts using these rules:
-
-    1. Extract data from "Qty", "Product", and "Total" columns:
-      - Always use the exact value from the "Total" column for cost
-      - Remove currency symbols from numbers
-
-    2. Format rules for substitutions:
-      - Use ONLY the substituted product name + " [SUB]"
-      - Use the Total value shown between original and substituted items
-      - Ignore the original product entry entirely
-
-    3. Skip these items:
-      - Products listed under "Unavailable"
-      - Text about price differences (e.g., "Was €X, now €Y")
-      - Department headers (e.g., "Fridge", "Freezer", "Cupboard")
-      - VAT/tax explanations
-
-    4. Stop processing at "Payment summary" section
-
-    Example output:
-    [
-      {"product":"Chicken Breast Fillets","quantity":1,"cost":5.69},
-      {"product":"Shannon Baking Parchment 12M [SUB]","quantity":1,"cost":1.20},
-      {"product":"Sprite Zero Sugar Lemon-Lime Soft Drink 2L","quantity":1,"cost":3.50}
-    ]
-```
+The upload limit is 4 MiB. It needs to be the final receipt email rather than the earlier order confirmation. Substitutions are marked with `[SUB]`, unavailable products are skipped, and the receipt totals are checked so dodgy or unfamiliar receipts fail with a useful error instead of quietly producing the wrong bill.
 
 ## TODO
+
 - [x] Host it as a 24/7 service on my home server.
-- [x] Loading indicator when waiting for LLM to respond.
+- [x] Loading indicator while the receipt is being processed.
 - [x] ~~Ability to export the final report so it can be shared in our group chat for transparency.~~ (PDF export of the page seems to work for us!)
 - [ ] Storing purchaser & item records in a database for record keeping purposes and maybe some fun analytics around our grocery purchases!
 
@@ -56,8 +26,8 @@ The app is publicly available as a Docker image at [ghcr.io/kavith-k/tesconomics
 ```bash
 docker run -d \
   --name tesconomics \
-  -e OPENROUTER_API_KEY=<OPENROUTER_API_KEY> \
   -e ORIGIN=<URL>:4567 \
+  -e HOUSEMATES="Alex,Sam" \
   -p 4567:3000 \
   --restart always \
   ghcr.io/kavith-k/tesconomics:latest
@@ -65,14 +35,14 @@ docker run -d \
 
 Alternatively, here's an example Docker Compose file:
 
-```YAML
+```yaml
 services:
   tesconomics:
     image: ghcr.io/kavith-k/tesconomics:latest
     container_name: tesconomics
     environment:
-      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
       - ORIGIN=<URL>:4567
+      - HOUSEMATES=Alex,Sam
     ports:
       - 4567:3000
     restart: always
@@ -82,18 +52,32 @@ services:
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Set `HOUSEMATES` to a comma-separated list of names. It's required when running the container and the development server; empty or repeated names aren't allowed. Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
-npm run dev
+HOUSEMATES="Alex,Sam" npm run dev
 
 # or start the server and open the app in a new browser tab
-npm run dev -- --open
+HOUSEMATES="Alex,Sam" npm run dev -- --open
 ```
+
+Run the checks with:
+
+```bash
+npm test
+npm run check
+npm run lint
+```
+
+The receipt tests use real emails, so the test data is deliberately not included in this public repository. Put your own final Tesco `.eml` receipts in `test-receipts/`, with filenames starting with a unique date like `2026-01-01.eml`. The emails and `test-receipts/expected.json` are ignored by Git.
+
+If you use a coding agent, you can ask it: “Follow [AGENTS.md](AGENTS.md) to check my local receipts against the parser, create `test-receipts/expected.json`, then run `npm test`.” The file holds checked counts and totals, plus a hash of each complete item list to catch later changes to names or prices. Review the results yourself before trusting them; generating expectations from the parser alone could lock in a mistake.
+
+Without receipts, you can still run `npm run check` and `npm run build`.
 
 ## Building
 
-To create a production version of your app:
+To create a production version of the app:
 
 ```bash
 npm run build
@@ -111,17 +95,17 @@ docker build -t tesconomics .
 
 2. Test run the app locally:
 
-**NOTE:** Make sure to specify your OpenRouter API Key & the URL in which the app will run on (e.g.: http://localhost:3000)
+**NOTE:** Make sure to specify the URL on which the app will run (e.g. `http://localhost:3000`).
 
 ```bash
 docker run \
   -p 3000:3000 \
-  -e OPENROUTER_API_KEY=${API_KEY} \
   -e ORIGIN=${URL} \
+  -e HOUSEMATES="Alex,Sam" \
   tesconomics
 ```
 
-3. Login to GitHub Packages (container registry)
+3. Login to GitHub Packages (container registry):
 
 ```bash
 echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
@@ -135,13 +119,13 @@ docker images
 
 **Make a note of the IMAGE ID you want to publish.**
 
-5. Tag latest image:
+5. Tag the latest image:
 
 ```bash
 docker tag <IMAGE ID> ghcr.io/kavith-k/tesconomics:latest
 ```
 
-6. Push to GitHub Packages
+6. Push to GitHub Packages:
 
 ```bash
 docker push ghcr.io/kavith-k/tesconomics:latest

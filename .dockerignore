@@ -5,3 +5,6 @@ build
 .git
 .gitignore
 .env*
+/test-receipts/
+/plan.md
+*.eml

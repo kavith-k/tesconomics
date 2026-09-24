@@ -10,8 +10,3 @@ export type Item = {
 	purchasers: string[];
 	cost: number;
 };
-
-export type FunctionResponse = {
-	status: 'success' | 'failure';
-	content: string;
-};
